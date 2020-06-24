@@ -1,11 +1,11 @@
 import React, { Fragment } from "react";
-// import ApolloClient from 'apollo-boost';
 import ApolloClient from "apollo-client";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { HttpLink } from "apollo-link-http";
 import { ApolloProvider } from "react-apollo";
 import { onError } from "apollo-link-error";
 import { ApolloLink } from "apollo-link";
+import {withClientState} from "apollo-link-state"
 import { GraphQLError, ExecutionResult } from "graphql";
 import { ServerError, ServerParseError } from "apollo-link-http-common";
 import "./App.css";
@@ -27,8 +27,8 @@ const error = onError(({ graphQLErrors, networkError }) => {
 
   if (networkError) console.log(`[Network error]: ${networkError}`);
 });
-const logoutLink = onError(({ networkError }: any) => {
-  if (networkError.statusCode === 401) localStorage.removeItem("x-session-id");
+const logoutLink = onError(({ networkError }) => {
+  if (networkError!==undefined && (networkError as ServerError).statusCode === 401) localStorage.removeItem("x-session-id");
 });
 
 const token = localStorage.getItem("x-session-id") as string;
@@ -45,12 +45,24 @@ const httpLink = new HttpLink({
   fetch,
 });
 
+const cache= new InMemoryCache({
+  addTypename: false,
+})
+
+const defaultState={
+  dashboard:{}
+}
+
+const stateLink = withClientState({
+  cache,
+  defaults:defaultState,
+  resolvers:{}
+})
+
 const createApolloClient = () => {
   return new ApolloClient({
-    link: ApolloLink.from([httpLink, logoutLink, error]),
-    cache: new InMemoryCache({
-      addTypename: false,
-    }),
+    link: ApolloLink.from([stateLink, httpLink, logoutLink, error]),
+    cache: cache,
     connectToDevTools: true,
   });
 };
