@@ -98,6 +98,7 @@ const ForgotForm: FC<Props> = (props: Props) => {
                   <Button
                     className="forgot-continue-btn"
                     type="primary"
+                    htmlType="submit"
                     loading={loading}
                   >
                     Submit
