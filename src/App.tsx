@@ -5,11 +5,12 @@ import { HttpLink } from "apollo-link-http";
 import { ApolloProvider } from "react-apollo";
 import { onError } from "apollo-link-error";
 import { ApolloLink } from "apollo-link";
-import {withClientState} from "apollo-link-state"
+import { withClientState } from "apollo-link-state";
 import { GraphQLError, ExecutionResult } from "graphql";
 import { ServerError, ServerParseError } from "apollo-link-http-common";
 import "./App.css";
 import AppNavigator from "./navigator/AppNavigator";
+import { BrowserRouter } from "react-router-dom";
 
 export interface ErrorResponse {
   graphQLErrors?: ReadonlyArray<GraphQLError>;
@@ -28,7 +29,11 @@ const error = onError(({ graphQLErrors, networkError }) => {
   if (networkError) console.log(`[Network error]: ${networkError}`);
 });
 const logoutLink = onError(({ networkError }) => {
-  if (networkError!==undefined && (networkError as ServerError).statusCode === 401) localStorage.removeItem("x-session-id");
+  if (
+    networkError !== undefined &&
+    (networkError as ServerError).statusCode === 401
+  )
+    localStorage.removeItem("x-session-id");
 });
 
 const token = localStorage.getItem("x-session-id") as string;
@@ -45,19 +50,19 @@ const httpLink = new HttpLink({
   fetch,
 });
 
-const cache= new InMemoryCache({
+const cache = new InMemoryCache({
   addTypename: false,
-})
+});
 
-const defaultState={
-  dashboard:{}
-}
+const defaultState = {
+  dashboard: {},
+};
 
 const stateLink = withClientState({
   cache,
-  defaults:defaultState,
-  resolvers:{}
-})
+  defaults: defaultState,
+  resolvers: {},
+});
 
 const createApolloClient = () => {
   return new ApolloClient({
@@ -73,7 +78,9 @@ function App() {
   return (
     <Fragment>
       <ApolloProvider client={client}>
-        <AppNavigator />
+        <BrowserRouter>
+          <AppNavigator />
+        </BrowserRouter>
       </ApolloProvider>
     </Fragment>
   );

@@ -1,7 +1,8 @@
 import React, { Fragment, Component, FC } from "react";
-import { Route, Switch, Redirect,useHistory, Router } from "react-router-dom";
+import { Route, Switch, Redirect } from "react-router-dom";
 import { RouteEnums } from "./routeEnums";
 import { history } from "./History";
+import Login from "../Containers/Auth/Login/Login";
 
 
 
@@ -21,8 +22,7 @@ class AppNavigator extends Component {
   componentDidMount() {
     const user = localStorage.getItem("x-session-id");
     if (user === null) {
-      // this.props.history.push(``)
-      useHistory().push(`/login`)
+      history.push(`/login`)
     }
 
   }
@@ -32,8 +32,8 @@ class AppNavigator extends Component {
   Auth: FC = () => (
     <Fragment>
       <Switch>
-      <Router history={history}>
-        <Route path={`/${RouteEnums.LOGIN}`} component={()=>null} exact />
+      {/* <Router history={history}> */}
+        <Route path={`/${RouteEnums.LOGIN}`} component={Login} exact />
         {/* <Route
           path={`/${RouteEnums.FORGOT_PASSWORD}`}
           component={ForgotPassword}
@@ -44,7 +44,7 @@ class AppNavigator extends Component {
           component={SetPassword}
           exact
         /> */}
-        </Router>
+        {/* </Router> */}
       </Switch>
     </Fragment>
   );
